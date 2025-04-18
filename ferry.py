@@ -3,6 +3,7 @@ class TicketBooking:
     bookings = [] 
 
     def _init_(self, passenger_id, name, travel_date, id_type):
+        #KISS: simple ID incrementing logic
         global ticket_counter
         self.ticket_id = ticket_counter
         self.passenger_id = passenger_id
@@ -15,12 +16,15 @@ class TicketBooking:
         ticket_counter += 1
 
     def gather_customer_info(self):
+        #KISS: Straigthforward data collection
+        #Dry violation: passenger information is collected here and also during the object creation.
         self.id_type = input("Please provide form of ID (Passport, Driver's License): ")
         self.passenger_id = input("Enter your ID number: ")
         self.name = input("Enter your name: ")
         print(f"Ticket ID {self.ticket_id} has been generated for {self.name}")
 
     def choose_services(self):
+        #Single responsibility violation: the method handles input, processing and validations
         services = []
         total_cost = 0
         while True:
@@ -37,6 +41,7 @@ class TicketBooking:
         print(f"Total service cost: ${self.total_amount:.2f}")
 
     def approve_booking(self):
+        #Open/Closed Principle violation: approval rule is hardcoded and not reusable.
         if self.total_amount < 300:
             self.status = "Approved"
         else:
@@ -48,6 +53,7 @@ class TicketBooking:
             print(f"Your approval reference number: {self.approval_ref}")
 
     def display_booking_details(self):
+        #Sindle responsibility violation: Displays data from data class
         print(f"\n=== Booking Details ===")
         print(f"Form of ID: {self.id_type}")
         print(f"ID Number: {self.passenger_id}")
@@ -60,12 +66,13 @@ class TicketBooking:
 
     @classmethod
     def display_statistics(cls):
-        total = len(cls.all_bookings)
+        total = len(cls.all_bookings)#DRY, Open/closed principle
         approved_count = 0
         pending_count = 0
         not_approved_count = 0
 
         for booking in cls.bookings:
+            #DRY : Repeated structure for status checking
             if booking.status == "Approved":
                 approved_count += 1
             elif booking.status == "Pending":
@@ -85,7 +92,9 @@ bookings_list = []
 counter = 0  
 
 while counter < 5:
+    #KISS: simple loop for collecting five bookings
     print(f"\nBooking {counter + 1}")
+    #DRY violation: This information is collected again in gather_customer_info
     passenger_id = input("Enter Passenger ID: ")
     passenger_name = input("Enter Passenger Name: ")
     travel_date = input("Enter Travel Date (e.g., 2025-04-11): ")
@@ -93,7 +102,7 @@ while counter < 5:
 
     new_booking = TicketBooking(passenger_id, passenger_name, travel_date, id_type)
 
-    new_booking.gather_customer_info()
+    new_booking.gather_customer_info()#DRY violation: duplicating input
     new_booking.choose_services()
 
     bookings_list.append(new_booking)
